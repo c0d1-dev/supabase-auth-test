@@ -27,3 +27,18 @@ export function createServerClient() {
     },
   )
 }
+
+export class AuthServerClient {
+  constructor(private client = createServerClient()) {}
+
+  async getUser(jwt?: string) {
+    return await this.client.auth.getUser(jwt)
+  }
+
+  async getUserOrThrow(jwt?: string) {
+    const { data, error } = await this.client.auth.getUser(jwt)
+    if (error) throw error
+    if (!data.user) throw new Error('User not found')
+    return data
+  }
+}
