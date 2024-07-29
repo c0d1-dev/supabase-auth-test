@@ -1,8 +1,8 @@
 'use client'
-import { createClient } from '~/services/supabase/client'
+import { createBrowserClient } from '~/services/supabase/browser-client'
 
 export const OAuthButton = () => {
-  const supabase = createClient()
+  const supabase = createBrowserClient()
 
   return (
     <button
@@ -10,6 +10,9 @@ export const OAuthButton = () => {
       onClick={() =>
         supabase.auth.signInWithOAuth({
           provider: 'google',
+          options: {
+            redirectTo: 'http://localhost:3000/auth/callback',
+          },
         })
       }
     >
