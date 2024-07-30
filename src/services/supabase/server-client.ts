@@ -41,4 +41,11 @@ export class AuthServerClient {
     if (!data.user) throw new Error('User not found')
     return data
   }
+
+  async getUserSessionOrThrow() {
+    const { data, error } = await this.client.auth.getSession()
+    if (error) throw error
+    if (!data.session) throw new Error('Session not found')
+    return data
+  }
 }

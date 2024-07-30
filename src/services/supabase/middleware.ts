@@ -1,6 +1,8 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+
 import {
+  ADMIN_ROUTES,
   SIGNED_HOME,
   SIGNED_ROUTES,
   UNSIGNED_HOME,
@@ -35,31 +37,35 @@ export async function authMiddleware(request: NextRequest) {
     },
   )
 
-  // IMPORTANT: Avoid writing any logic between createServerClient and
+  //! IMPORTANT: Avoid writing any logic between createServerClient and
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  console.log('redirecting , 🥊🥊', { user: user?.id, url: request.url })
+
   if (
     !user &&
     SIGNED_ROUTES.some((r) => r.startsWith(request.nextUrl.pathname))
   ) {
-    // no user, potentially respond by redirecting the user to the login page
-    // const url = request.nextUrl.clone()
-    // url.pathname = '/sign-in'
-
     const url = new URL(UNSIGNED_HOME, request.url)
     return NextResponse.redirect(url)
   }
-  if (
-    user &&
-    UNSIGNED_ROUTES.some((r) => r.startsWith(request.nextUrl.pathname))
-  ) {
-    const url = new URL(SIGNED_HOME, request.url)
-    return NextResponse.redirect(url)
+
+  if (user) {
+    if (UNSIGNED_ROUTES.some((r) => r.startsWith(request.nextUrl.pathname))) {
+      const url = new URL(SIGNED_HOME, request.url)
+      return NextResponse.redirect(url)
+    }
+    const isAdmin = true
+    if (
+      !isAdmin &&
+      ADMIN_ROUTES.some((r) => r.startsWith(request.nextUrl.pathname))
+    ) {
+      const url = new URL(SIGNED_HOME, request.url)
+      return NextResponse.redirect(url)
+    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're

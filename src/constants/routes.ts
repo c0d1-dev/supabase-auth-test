@@ -1,4 +1,5 @@
-export const SIGNED_ROUTES = ['/profile'] as const
+export const ADMIN_ROUTES = ['/organization'] as const
+export const SIGNED_ROUTES = ['/profile', '/organization'] as const
 export const UNSIGNED_ROUTES = ['/sign-in'] as const
 
 export const SIGNED_HOME = SIGNED_ROUTES[0]
